@@ -1,7 +1,6 @@
-import { defineComponent, nextTick, onMounted, reactive, ref, watch, watchEffect } from 'vue';
-import { load, accountBuffer, loadWeb3, loadTodoList, putContract } from '@/api/contrast';
+import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { load, loadWeb3, loadTodoList, putContract } from '@/api/contrast';
 import TodoList from '@/components/TodoList';
-import { globalVars } from '@/utils';
 
 export default defineComponent({
   name: 'HomeView',

@@ -14,9 +14,9 @@ export const load = async () => {
 
 /**
  *
- * @param todoContract: 合约
- * @param address: 地址
- * @returns {Promise<Object>} 返回一个json对象
+ * @param todoContract: contrast
+ * @param address: address
+ * @returns {Promise<Object>} a json object
  */
 export const loadTodoList = async (todoContract, address) => {
   const tasksJsonString = await todoContract.tasks(address);
