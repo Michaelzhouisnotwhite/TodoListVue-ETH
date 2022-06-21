@@ -7,6 +7,7 @@ export default defineComponent({
   props: {
     data: {
       require: true,
+      default: [],
     },
   },
   setup(props, ctx) {
@@ -19,9 +20,10 @@ export default defineComponent({
 
     // state
     // const todos = ref(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
-    const propsTodoList = ref(props.data)
+    const propsTodoList = ref(props.data);
 
-    const todos =  ref(JSON.parse(JSON.stringify(propsTodoList.value)));
+    // const todos =  ref(props.data);
+    const todos = ref(JSON.parse(JSON.stringify(propsTodoList.value)));
 
     const visibility = ref('all');
     const editedTodo = ref();
@@ -34,11 +36,6 @@ export default defineComponent({
     window.addEventListener('hashchange', onHashChange);
     onHashChange();
 
-    // persist state
-    // Don't need for blockchain
-    // watchEffect(() => {
-    //   localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.value));
-    // });
 
     function toggleAll(e) {
       todos.value.forEach((todo) => (todo.completed = e.target.checked));
@@ -98,15 +95,6 @@ export default defineComponent({
       }
     }
 
-    // watch(
-    //     () => todos,
-    //     (newVal) => {
-    //       ctx.emit('todoListChange', newVal.value);
-    //     },
-    //     {
-    //       deep: true,
-    //     },
-    // );
     function toggleTodo(todo) {
       console.log(todo);
       todo.completed = !todo.completed;
@@ -134,7 +122,7 @@ export default defineComponent({
   template:/*html*/`
     <section class="todoapp">
     <header class="header">
-      <h1>todos</h1>
+      <h1>Todos</h1>
       <input
           class="new-todo"
           autofocus
