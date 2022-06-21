@@ -2,6 +2,8 @@ import { reactive } from 'vue';
 
 export const globalVars = reactive({
   web3: null,
+  account:null,
+  accountBuffer:null,
 });
 
 export const intervalIdManager = reactive({

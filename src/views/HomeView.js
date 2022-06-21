@@ -1,5 +1,4 @@
 import { defineComponent, onMounted } from 'vue';
-import { MetaMask } from '@/api/contrast';
 import { load } from '@/api/contrast';
 import { globalVars, intervalIdManager } from '@/utils';
 
@@ -16,18 +15,21 @@ export default defineComponent({
 
     // let checkId = intervalIdManager.pushId()
     function onClicked() {
-
+      load().then(e => {
+        console.log(e.addressAccount);
+        console.log(e.tasks);
+        console.log(e.todoContract);
+      });
     }
 
     return {onClicked};
   },
   components: {
-    MetaMask,
   },
   //language=HTML
   template: `
     <h1>Home View</h1>
-    <meta-mask></meta-mask>
+<!--    <meta-mask></meta-mask>-->
     <button @click="onClicked">Button</button>
     <div>
       <h2></h2>
