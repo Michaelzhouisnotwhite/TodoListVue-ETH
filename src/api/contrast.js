@@ -1,47 +1,53 @@
-// noinspection JSUnresolvedFunction
-
-import { defineComponent, ref } from 'vue';
-import VueMetamask from 'vue-metamask';
-import TodoListJSON from '../../sol_build/TodoList.json';
+import { ref } from 'vue';
+import TodoListJSON from '../../sol_build/TodoListUpgrade.json';
 import { globalVars, intervalIdManager } from '@/utils';
 import Web3 from 'web3';
+import contract from '@truffle/contract';
 
-// let contract = require('@truffle/contract');
-import contract from '@truffle/contract'
-// const web3 = ref(null);
+// check the account when it had been changed
+export const accountBuffer = ref('');
+
+
+/**
+ * load smart contrast
+ * @returns {Promise<{addressAccount: *, todoContract: *}>}
+ */
 export const load = async () => {
-  await loadWeb3();
   const addressAccount = await loadAccount();
-  globalVars.account = addressAccount;
-  const {todoContract, tasks} = await loadContract(addressAccount);
+  const todoContract = await loadContract();
 
-  return {addressAccount, todoContract, tasks};
+  return { addressAccount, todoContract };
 };
 
-const loadTasks = async (todoContract, addressAccount) => {
-  const tasksCount = await todoContract.tasksCount(addressAccount);
-  const tasks = [];
-  for (let i = 0; i < tasksCount; i++) {
-    const task = await todoContract.tasks(addressAccount, i);
-    tasks.push(task);
-  }
-  return tasks;
+/**
+ *
+ * @param todoContract: 合约
+ * @returns {Promise<Object>} 返回一个json对象
+ */
+export const loadTodoList = async (todoContract) => {
+  const tasksJsonString = await todoContract.get();
+  return (tasksJsonString === '') ? JSON.parse('[]') : JSON.parse(tasksJsonString);
 };
 
-const loadContract = async (addressAccount) => {
+/**
+ * load contract
+ * @returns {Promise<Contract>}
+ */
+const loadContract = async () => {
   const theContract = contract(TodoListJSON);
-  theContract.setProvider(globalVars.web3.eth.currentProvider);
-  const todoContract = await theContract.deployed();
-  const tasks = await loadTasks(todoContract, addressAccount);
-
-  return {todoContract, tasks};
+  theContract.setProvider(window.web3.eth.currentProvider);
+  return await theContract.deployed();
 };
 
 const loadAccount = async () => {
-  return await globalVars.web3.eth.getCoinbase();
+  return await window.web3.eth.getCoinbase();
 };
 
-const loadWeb3 = async () => {
+/**
+ * 载入web3组件
+ * @returns {Promise<void>}: no returns
+ */
+export const loadWeb3 = async () => {
   // Modern dapp browsers...
   let intervalId = null;
   if (window.ethereum) {
@@ -53,18 +59,21 @@ const loadWeb3 = async () => {
       // Accounts now exposed
       // web3.eth.sendTransaction({/* ... */});
 
-      globalVars.web3 = await window.web3
-      console.log(window.web3.eth.getCoinbase());
-      console.log(2, globalVars);
+      // globalVars.web3 = await window.web3;
+      // console.log(2, globalVars);
 
-      intervalId = intervalIdManager.pushId(async () => {
-        globalVars.accountBuffer = await window.web3.eth.getCoinbase()
-      }, 1000)
+      // 添加
+      // intervalId = intervalIdManager.pushId(async () => {
+      //   accountBuffer.value = await window.web3.eth.getCoinbase();
+      //   globalVars.web3 = window.web3
+      // }, 1000);
+
     } catch (error) {
       // User denied account access...
       console.log(error);
       console.log(3);
-      globalVars.web3 = null
+      // intervalIdManager.popId(intervalId);
+      globalVars.web3 = null;
     }
   }
   // Legacy dapp browsers...
@@ -73,19 +82,29 @@ const loadWeb3 = async () => {
     // Accounts always exposed
     // web3.eth.sendTransaction({/* ... */});
     console.log(4);
-    globalVars.web3 = window.web3
+    // globalVars.web3 = window.web3;
+
+    // intervalId = intervalIdManager.pushId(async () => {
+    //   accountBuffer.value = await window.web3.eth.getCoinbase();
+    // }, 1000);
+
+    // window.ethereum.on("accountsChanged", async function(accounts) {
+    //   accountBuffer.value = await window.web3.eth.getCoinbase();
+    //   globalVars.web3 = window.web3;//一旦切换账号这里就会执行
+    // });
   }
   // Non-dapp browsers...
   else {
+    // intervalIdManager.popId(intervalId);
+
     console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
     window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
-    globalVars.web3 = null
+    globalVars.web3 = null;
   }
-  // let account = window.web3.eth.accounts[0];
-  // let accountInterval = setInterval(function () {
-  //     if (window.web3.eth.accounts[0] !== account) {
-  //         account = window.web3.eth.accounts[0];
-  //         location.reload()
-  //     }
-  // }, 100);
 };
+
+
+export async function putContract(contract, address, data) {
+  const dataStr = JSON.stringify(data);
+  await contract.put(dataStr, {from: address})
+}

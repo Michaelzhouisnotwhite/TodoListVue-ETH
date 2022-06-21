@@ -1,9 +1,9 @@
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 export const globalVars = reactive({
   web3: null,
   account:null,
-  accountBuffer:null,
+  accountBuffer:"",
 });
 
 export const intervalIdManager = reactive({
