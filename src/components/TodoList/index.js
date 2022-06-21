@@ -83,6 +83,7 @@ export default defineComponent({
 
     function removeCompleted() {
       todos.value = filters.active(todos.value);
+      ctx.emit('todoListChange', todos.value);
     }
 
     function onHashChange() {

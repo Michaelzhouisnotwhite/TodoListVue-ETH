@@ -50,7 +50,7 @@ export default defineComponent({
       console.log('newVal props', newVal);
       putContract(contractInfo.contract, contractInfo.addressAccount, newVal).then(() => {
         updateTodoList();
-        refreshComponent(todoKey);
+        // refreshComponent(todoKey);
       }).catch(err => {
         console.log(err.message);
         updateTodoList();
